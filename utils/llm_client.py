@@ -18,8 +18,8 @@ from config.config import (
     AZURE_OPENAI_API_KEY,
     AZURE_OPENAI_DEPLOYMENT,
     AZURE_API_VERSION,
+    TEMPERATURE,
     MAX_TOKENS,
-    TEMPERATURE
 )
 
 
@@ -341,61 +341,61 @@ Consider:
                 "reasoning": f"Error: {str(e)}"
             }
 
-def extract_text_from_image(self, image_base64: str) -> str:
-        """
-        Extract text from an image using GPT-4 Vision.
+    def extract_text_from_image(self, image_base64: str) -> str:
+            """
+            Extract text from an image using GPT-4 Vision.
         
-        This is used as an alternative to Tesseract OCR.
-        No local installation required!
+            This is used as an alternative to Tesseract OCR.
+            No local installation required!
         
-        Args:
-            image_base64: Base64-encoded image string
+            Args:
+                image_base64: Base64-encoded image string
         
-        Returns:
-            Extracted text from the image
-        """
-        try:
-            # Create vision message
-            messages = [
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": """Extract all text from this image. This is likely a schedule or calendar.
+            Returns:
+                Extracted text from the image
+            """
+            try:
+             # Create vision message
+                messages = [
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                             "type": "text",
+                                "text": """Extract all text from this image. This is likely a schedule or calendar.
                             
-Return the text exactly as it appears, preserving:
-- All dates and times
-- All event names
-- All locations
-- All other visible text
+    Return the text exactly as it appears, preserving:
+    - All dates and times
+    - All event names
+    - All locations
+    - All other visible text
 
-Format the output in a clear, readable way. If it's a schedule, maintain the chronological order."""
-                        },
-                        {
-                            "type": "image_url",
-                            "image_url": {
+    Format the output in a clear, readable way. If it's a schedule, maintain the chronological order."""
+                            },
+                            {
+                                "type": "image_url",
+                                "image_url": {
                                 "url": f"data:image/png;base64,{image_base64}"
+                                }
                             }
-                        }
-                    ]
-                }
-            ]
+                        ]
+                    }
+                ]
             
-            # Make API call
-            response = self.client.chat.completions.create(
-                model=self.deployment,
-                messages=messages,
-                max_tokens=self.max_tokens,
-                temperature=0.0  # Deterministic for OCR
-            )
+                # Make API call
+                response = self.client.chat.completions.create(
+                  model=self.deployment,
+                  messages=messages,
+                  max_tokens=self.max_tokens,
+                  temperature=0.0  # Deterministic for OCR
+                )
             
-            # Extract text from response
-            return response.choices[0].message.content
+                # Extract text from response
+                return response.choices[0].message.content
         
-        except Exception as e:
-            print(f"✗ Error extracting text from image: {e}")
-            raise
+            except Exception as e:
+                print(f"✗ Error extracting text from image: {e}")
+                raise
 
 def main():
     """
