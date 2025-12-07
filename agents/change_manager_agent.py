@@ -129,7 +129,7 @@ class ChangeManagerAgent:
         
         return result
     
-    def _get_context_events(self, days_ahead: int = 30) -> List[Dict]:
+    def _get_context_events(self, days_ahead: int = 90) -> List[Dict]:
         """
         Get upcoming events for context.
         
