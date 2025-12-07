@@ -132,7 +132,7 @@ class OrchestratorAgent:
             'details': results
         }
     
-    def modify_event(self, command: str) -> Dict:
+    def modify_event(self, command: str, interactive: bool = True) -> Dict:
         """
         Workflow: Modify calendar event with natural language.
         
@@ -146,7 +146,7 @@ class OrchestratorAgent:
         print("🔄 WORKFLOW: Modify Event")
         print("="*60)
         
-        result = self.change_manager.process_command(command)
+        result = self.change_manager.process_command(command, interactive=interactive)
         
         # If successful, check for new conflicts
         if result['status'] == 'success' and result.get('event'):
