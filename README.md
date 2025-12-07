@@ -23,7 +23,7 @@ AI-powered calendar management system with multi-agent architecture. Automatical
 
 ### Technology Stack
 
-- Python 3.12+
+- Python 3.12 (If you use a new version, you may experience compatibility issues with other settings)
 - Azure OpenAI (GPT-4o)
 - Google Calendar API
 - GPT-4 Vision for OCR (no Tesseract needed!)
