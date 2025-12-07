@@ -26,7 +26,7 @@ class ChangeManagerAgent:
     - Move events to new dates/times
     - Cancel/delete events
     - Update event details (title, location, description)
-    - Handle ambiguous commands with user confirmation
+    - Handle ambiguous commands with interactive selection
     """
     
     def __init__(
@@ -46,12 +46,13 @@ class ChangeManagerAgent:
         
         print("✓ Change Manager Agent initialized")
     
-    def process_command(self, command: str) -> Dict:
+    def process_command(self, command: str, interactive: bool = True) -> Dict:
         """
         Process a natural language modification command.
         
         Args:
             command: Natural language command (e.g., "move soccer to Friday")
+            interactive: Whether to ask user for clarification on ambiguous matches
         
         Returns:
             Result dictionary with status and details
@@ -100,13 +101,60 @@ class ChangeManagerAgent:
                 'searched_for': parsed_command.get('event_identifier')
             }
         
+        # Handle multiple matches - INTERACTIVE PART!
         if len(matching_events) > 1:
-            return {
-                'status': 'ambiguous',
-                'message': f'Found {len(matching_events)} matching events',
-                'events': matching_events
-            }
+            # Check if user said "all" or "both" in original command
+            command_lower = command.lower()
+            if 'all' in command_lower or 'both' in command_lower:
+                print(f"\n✓ Detected 'all/both' in command - processing all {len(matching_events)} events")
+                return self._process_multiple_events(matching_events, parsed_command)
+            
+            if not interactive:
+                return {
+                    'status': 'ambiguous',
+                    'message': f'Found {len(matching_events)} matching events',
+                    'events': matching_events
+                }
+            
+            # Interactive selection
+            print(f"\n⚠️  Found {len(matching_events)} matching events:")
+            for i, event in enumerate(matching_events, 1):
+                start = event.get('start', {}).get('dateTime', 'Unknown')
+                location = event.get('location', '')
+                print(f"  {i}. {event.get('summary')}")
+                print(f"     📅 {start}")
+                if location:
+                    print(f"     📍 {location}")
+            
+            # Ask user what to do
+            print(f"\nWhat would you like to do?")
+            print(f"  • Enter number(s) to select specific event(s): 1, 2, 1-3, all")
+            print(f"  • Press Enter to cancel")
+            
+            selection = input("\nYour choice: ").strip().lower()
+            
+            if not selection:
+                return {
+                    'status': 'cancelled',
+                    'message': 'User cancelled operation'
+                }
+            
+            # Parse selection
+            selected_events = self._parse_selection(selection, matching_events)
+            
+            if not selected_events:
+                return {
+                    'status': 'error',
+                    'message': 'Invalid selection'
+                }
+            
+            # Process multiple events
+            return self._process_multiple_events(
+                selected_events,
+                parsed_command
+            )
         
+        # Single match - proceed as before
         target_event = matching_events[0]
         print(f"✓ Found event: {target_event.get('summary')}")
         print(f"  Current: {target_event.get('start', {}).get('dateTime')}")
@@ -165,19 +213,18 @@ class ChangeManagerAgent:
         event_name = identifier.lower()
         
         # Look for ISO date format (YYYY-MM-DD) anywhere in the identifier
-        import re
         date_pattern = r'(\d{4}-\d{2}-\d{2})'
         date_match = re.search(date_pattern, identifier)
 
         if date_match:
             try:
-             date_str = date_match.group(1)
-             target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-             # Remove the date part from event name
-             event_name = identifier.split(date_str)[0]
-             # Clean up event name (remove trailing colons and spaces)
-             event_name = event_name.rstrip(': T').lower()
-             print(f"  🔍 Searching for: '{event_name}' on {target_date}")
+                date_str = date_match.group(1)
+                target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+                # Remove the date part from event name
+                event_name = identifier.split(date_str)[0]
+                # Clean up event name (remove trailing colons and spaces)
+                event_name = event_name.rstrip(': T').lower()
+                print(f"  🔍 Searching for: '{event_name}' on {target_date}")
             except Exception as e:
                 print(f"  ⚠️  Could not parse date: {e}")
     
@@ -221,6 +268,112 @@ class ChangeManagerAgent:
                 matching.append(event)
         
         return matching
+    
+    def _parse_selection(self, selection: str, events: List[Dict]) -> List[Dict]:
+        """
+        Parse user's selection input.
+        
+        Args:
+            selection: User input like "1", "1,3", "1-4", "all"
+            events: List of events to select from
+        
+        Returns:
+            List of selected events
+        """
+        selected = []
+        
+        # Handle "all"
+        if selection == 'all':
+            return events
+        
+        # Parse comma-separated values
+        parts = selection.replace(' ', '').split(',')
+        
+        for part in parts:
+            try:
+                # Handle ranges like "1-3"
+                if '-' in part:
+                    start, end = part.split('-')
+                    start_idx = int(start) - 1
+                    end_idx = int(end) - 1
+                    
+                    if 0 <= start_idx < len(events) and 0 <= end_idx < len(events):
+                        selected.extend(events[start_idx:end_idx + 1])
+                else:
+                    # Single number
+                    idx = int(part) - 1
+                    if 0 <= idx < len(events):
+                        selected.append(events[idx])
+            except (ValueError, IndexError):
+                continue
+        
+        return selected
+    
+    def _process_multiple_events(
+        self,
+        events: List[Dict],
+        parsed_command: Dict
+    ) -> Dict:
+        """
+        Process action on multiple events.
+        
+        Args:
+            events: List of events to process
+            parsed_command: Parsed command details
+        
+        Returns:
+            Result dictionary
+        """
+        action = parsed_command.get('action')
+        
+        print(f"\n[4/4] Executing {action} on {len(events)} event(s)...")
+        
+        results = {
+            'successful': [],
+            'failed': []
+        }
+        
+        for i, event in enumerate(events, 1):
+            print(f"\n  [{i}/{len(events)}] {event.get('summary')}")
+            
+            if action == 'move':
+                result = self._move_event(event, parsed_command)
+            elif action == 'delete':
+                result = self._delete_event(event)
+            elif action == 'modify':
+                result = self._modify_event(event, parsed_command)
+            else:
+                result = {'status': 'error', 'message': f'Unsupported action: {action}'}
+            
+            if result.get('status') == 'success':
+                results['successful'].append(event.get('summary'))
+                print(f"  ✓ Success")
+            else:
+                results['failed'].append(event.get('summary'))
+                print(f"  ✗ Failed: {result.get('message')}")
+        
+        # Summary
+        print(f"\n{'='*60}")
+        print("BATCH OPERATION SUMMARY")
+        print(f"{'='*60}")
+        print(f"✓ Successful: {len(results['successful'])}")
+        print(f"✗ Failed: {len(results['failed'])}")
+        
+        if results['successful']:
+            print("\nSuccessfully processed:")
+            for name in results['successful']:
+                print(f"  • {name}")
+        
+        if results['failed']:
+            print("\nFailed:")
+            for name in results['failed']:
+                print(f"  • {name}")
+        
+        return {
+            'status': 'success' if results['successful'] else 'error',
+            'message': f"Processed {len(results['successful'])} out of {len(events)} events",
+            'results': results
+        }
     
     def _move_event(self, event: Dict, parsed_command: Dict) -> Dict:
         """
@@ -396,6 +549,7 @@ def main():
     print("Try commands like:")
     print("  - 'move Machine Learning to Friday at 2pm'")
     print("  - 'cancel AI and Society'")
+    print("  - 'cancel all Business Analytics events'")
     print("  - 'change location of Neural Networks to Room 101'")
     print("  - 'reschedule Applied AI to next Monday'")
     print("\nType 'quit' to exit")
@@ -413,7 +567,7 @@ def main():
                 break
             
             # Process the command
-            result = agent.process_command(command)
+            result = agent.process_command(command, interactive=True)
             
             # Display result
             print("\n" + "="*60)
@@ -428,11 +582,17 @@ def main():
                     print(f"\nChanges made:")
                     for key, value in result['changes'].items():
                         print(f"  - {key}: {value}")
+                if result.get('results'):
+                    # Batch operation results already displayed
+                    pass
             
             elif status == 'error':
                 print(f"✗ {result.get('message')}")
                 if result.get('details'):
                     print(f"  Details: {result.get('details')}")
+            
+            elif status == 'cancelled':
+                print(f"⚠️  {result.get('message')}")
             
             elif status == 'ambiguous':
                 print(f"⚠️  {result.get('message')}")
