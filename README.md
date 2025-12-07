@@ -149,7 +149,6 @@ schedule_agent_system/
 ├── config/                      # Configuration
 │   ├── config_template.py      # Template for credentials
 │   ├── credentials_template.json # Template for Google creds
-│   └── [config.py]             # Your actual config (not in Git)
 ├── tests/
 │   └── sample_schedules/       # Test schedule files
 ├── main.py                      # Main application
