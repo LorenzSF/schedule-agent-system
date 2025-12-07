@@ -2,16 +2,16 @@
 
 AI-powered calendar management system with multi-agent architecture. Automatically parse schedules from PDFs/images, detect conflicts, and manage events with natural language.
 
-## ✨ Features
+##  Features
 
-- 📥 **Import Schedules**: Parse PDFs and screenshots automatically
-- ✏️ **Natural Language Modifications**: "Move meeting to Friday at 2pm"
-- 🔍 **Intelligent Conflict Detection**: Detect overlaps and tight schedules
-- 💡 **AI-Powered Suggestions**: Get smart scheduling advice
-- ⚙️ **User Configurable**: Customize gap times and preferences
-- 🤖 **Multi-Agent Architecture**: Specialized agents work together
+-  **Import Schedules**: Parse PDFs and screenshots automatically
+-  **Natural Language Modifications**: "Move meeting to Friday at 2pm"
+-  **Intelligent Conflict Detection**: Detect overlaps and tight schedules
+-  **AI-Powered Suggestions**: Get smart scheduling advice
+-  **User Configurable**: Customize gap times and preferences
+-  **Multi-Agent Architecture**: Specialized agents work together
 
-## 🏗️ Architecture
+##  Architecture
 
 ### Agents
 
@@ -28,7 +28,7 @@ AI-powered calendar management system with multi-agent architecture. Automatical
 - Google Calendar API
 - GPT-4 Vision for OCR (no Tesseract needed!)
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 
@@ -104,7 +104,7 @@ On first run:
 2. You'll be asked to configure minimum gap between events
 3. Main menu will appear
 
-## 📚 Usage
+##  Usage
 
 ### Import a Schedule
 
@@ -129,11 +129,11 @@ Select option 2 and use natural language:
 
 ### Check Conflicts
 Select option 3 to analyze your calendar for:
-- ❌ Overlapping events
-- ⚠️ Tight schedules (insufficient gap time)
-- 💡 Back-to-back events at different locations
+-  Overlapping events
+-  Tight schedules (insufficient gap time)
+-  Back-to-back events at different locations
 
-## 📁 Project Structure
+##  Project Structure
 ```
 schedule_agent_system/
 ├── agents/                      # All agent modules
@@ -157,7 +157,7 @@ schedule_agent_system/
 └── README.md                    # This file
 ```
 
-## 🔧 Configuration
+##  Configuration
 
 ### Minimum Gap Between Events
 
@@ -179,7 +179,7 @@ Change in `config/config.py`:
 DEFAULT_TIMEZONE = 'America/New_York'  # Change to your timezone
 ```
 
-## 🧪 Testing
+##  Testing
 
 Run agent tests individually:
 ```bash
@@ -196,7 +196,7 @@ python agents/conflict_detector_agent.py
 python agents/change_manager_agent.py
 ```
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### "Credentials file not found"
 Ensure `config/credentials.json` exists and contains valid Google OAuth credentials.
@@ -210,7 +210,7 @@ Run: `pip install -r requirements.txt`
 ### "Token has been expired or revoked"
 Delete `config/token.json` and re-authenticate.
 
-## 📝 Requirements
+##  Requirements
 See [requirements.txt](requirements.txt) for full list.
 
 Key dependencies:
@@ -219,17 +219,16 @@ Key dependencies:
 - `PyPDF2>=3.0.1` - PDF text extraction
 - `Pillow>=11.0.0` - Image processing
 
-## 🎓 Academic Context
+##  Academic Context
 This project was developed for the Applied AI course at KU Leuven (2025) as a demonstration of agentic AI systems and practical LLM integration.
 
 ### Assignment Requirements Met
-
-✅ Extract schedule information from PDF/screenshots  
-✅ Translate to API calls for calendar updates  
-✅ Handle user modification requests with natural language  
-✅ Detect scheduling conflicts  
-✅ Multi-agent collaboration and coordination  
-✅ Working prototype with complete documentation  
+- Extract schedule information from PDF/screenshots  
+- Translate to API calls for calendar updates  
+- Handle user modification requests with natural language  
+- Detect scheduling conflicts  
+- Multi-agent collaboration and coordination  
+- Working prototype with complete documentation  
 
 ## 👨‍💻 Author
 
