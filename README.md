@@ -32,7 +32,7 @@ AI-powered calendar management system with multi-agent architecture. Automatical
 
 ### Prerequisites
 
-- Python 3.12 or higher
+- Python 3.12 (If you use a new version, you may experience compatibility issues with other settings)
 - Google account
 - Azure OpenAI API access (or OpenAI API key)
 
@@ -176,7 +176,7 @@ Suggested values:
 
 Change in `config/config.py`:
 ```python
-DEFAULT_TIMEZONE = 'America/New_York'  # Change to your timezone
+DEFAULT_TIMEZONE = 'Europe/Brussels'  # Change to your timezone
 ```
 
 ##  Testing
@@ -204,11 +204,6 @@ Ensure `config/credentials.json` exists and contains valid Google OAuth credenti
 ### "Azure OpenAI authentication failed"
 Check that `config/config.py` has correct Azure credentials or environment variables are set.
 
-### "No module named 'anthropic'" or similar
-Run: `pip install -r requirements.txt`
-
-### "Token has been expired or revoked"
-Delete `config/token.json` and re-authenticate.
 
 ##  Requirements
 See [requirements.txt](requirements.txt) for full list.
@@ -231,10 +226,9 @@ This project was developed for the Applied AI course at KU Leuven (2025) as a de
 - Working prototype with complete documentation  
 
 ## 👨‍💻 Author
-
 **Lorenzo Stefano Fresca**  
 AI Master's Program  
-KU Leuven, 2025
+KU Leuven, November of 2025
 
 ## 📄 License
 Educational project - KU Leuven
