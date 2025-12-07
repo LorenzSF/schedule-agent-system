@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+Your version of README content
+=======
+GitHub's version of README content
+>>>>>>> origin/main
 # Schedule Agent System
 
 AI-powered calendar management system with multi-agent architecture. Automatically parse schedules from PDFs/images, detect conflicts, and manage events with natural language.
@@ -240,3 +245,7 @@ KU Leuven, 2025
 ## 📄 License
 Educational project - KU Leuven
 
+=======
+# schedule-agent-system
+AI-powered calendar management with multi-agent architecture
+>>>>>>> 29b54ea0830ee37d38c01d3b7c869283009b4880
